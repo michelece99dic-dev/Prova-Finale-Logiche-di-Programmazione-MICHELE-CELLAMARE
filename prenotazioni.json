@@ -7,17 +7,17 @@
     "FasciaOraria": "09:00-11:00"
   },
   {
-    "Id": 2,
-    "Studente": "Michele",
-    "Aula": "Aula B",
-    "Data": "2027-11-16T00:00:00",
-    "FasciaOraria": "11:00-13:00"
-  },
-  {
     "Id": 3,
     "Studente": "Teresa",
     "Aula": "Aula B",
     "Data": "2000-11-18T00:00:00",
     "FasciaOraria": "16:00-18:00"
+  },
+  {
+    "Id": 4,
+    "Studente": "Miriana",
+    "Aula": "Aula Z",
+    "Data": "1997-10-18T00:00:00",
+    "FasciaOraria": "11:00-13:00"
   }
 ]
