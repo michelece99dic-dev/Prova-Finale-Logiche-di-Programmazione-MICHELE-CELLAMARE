@@ -19,12 +19,5 @@
     "Aula": "Aula B",
     "Data": "2000-11-18T00:00:00",
     "FasciaOraria": "16:00-18:00"
-  },
-  {
-    "Id": 4,
-    "Studente": "Michele",
-    "Aula": "Laboratorio 1",
-    "Data": "1999-11-18T00:00:00",
-    "FasciaOraria": "11:00-13:00"
   }
 ]
