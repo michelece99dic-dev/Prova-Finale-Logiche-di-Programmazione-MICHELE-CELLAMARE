@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO; // Necessario per gestire i file
+using System.Text.Json; // Necessario per il formato JSON
 
 namespace GestioneAuleStudio
 {
@@ -17,18 +19,23 @@ namespace GestioneAuleStudio
     {
         static List<Prenotazione> databasePrenotazioni = new List<Prenotazione>();
         static int contatoreId = 1;
-        // Costante per la capienza
-        const int CAPIENZA_MASSIMA = 15; 
+        const int CAPIENZA_MASSIMA = 15;
+        
+        // Nome del file dove verranno salvati i dati
+        static string pathFile = "prenotazioni.json";
 
         static string[] auleDisponibili = { "Aula A", "Aula B", "Aula Informatica", "Laboratorio" };
         static string[] fasceOrarie = { "09:00-11:00", "11:00-13:00", "14:00-16:00", "16:00-18:00" };
 
         static void Main(string[] args)
         {
+            // All'avvio, carichiamo i dati salvati precedentemente
+            CaricaDati();
+
             while (true)
             {
                 Console.Clear();
-                Console.WriteLine("=== SISTEMA PRENOTAZIONE AULE (MAX 15 POSTI) ===");
+                Console.WriteLine("=== SISTEMA PRENOTAZIONE AULE (DATI PERSISTENTI) ===");
                 Console.WriteLine("1. Accesso Studente");
                 Console.WriteLine("2. Accesso Amministratore (Manager)");
                 Console.WriteLine("0. Esci");
@@ -41,6 +48,47 @@ namespace GestioneAuleStudio
             }
         }
 
+        #region GESTIONE FILE (PERSISTENZA)
+        static void SalvaDati()
+        {
+            try
+            {
+                // Serializza la lista in una stringa JSON
+                string jsonString = JsonSerializer.Serialize(databasePrenotazioni, new JsonSerializerOptions { WriteIndented = true });
+                // Scrive la stringa nel file
+                File.WriteAllText(pathFile, jsonString);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore nel salvataggio: {ex.Message}");
+            }
+        }
+
+        static void CaricaDati()
+        {
+            try
+            {
+                if (File.Exists(pathFile))
+                {
+                    string jsonString = File.ReadAllText(pathFile);
+                    databasePrenotazioni = JsonSerializer.Deserialize<List<Prenotazione>>(jsonString);
+                    
+                    // Aggiorniamo il contatore ID per non sovrascrivere quelli esistenti
+                    if (databasePrenotazioni.Count > 0)
+                    {
+                        contatoreId = databasePrenotazioni.Max(p => p.Id) + 1;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Errore nel caricamento: {ex.Message}");
+                databasePrenotazioni = new List<Prenotazione>();
+            }
+        }
+        #endregion
+
+        #region LOGICA STUDENTE (CON SALVATAGGIO AUTOMATICO)
         static void MenuStudente()
         {
             Console.Write("\nInserisci il tuo nome: ");
@@ -69,26 +117,21 @@ namespace GestioneAuleStudio
         {
             Console.Clear();
             Console.WriteLine("--- NUOVA PRENOTAZIONE ---");
-            
             for (int i = 0; i < auleDisponibili.Length; i++) Console.WriteLine($"{i + 1}. {auleDisponibili[i]}");
-            Console.Write("Scegli l'aula (numero): ");
+            Console.Write("Aula (n.): ");
             int indexAula = int.Parse(Console.ReadLine()) - 1;
 
             Console.Write("Data (gg/mm/aaaa): ");
             DateTime data = DateTime.Parse(Console.ReadLine());
 
             for (int i = 0; i < fasceOrarie.Length; i++) Console.WriteLine($"{i + 1}. {fasceOrarie[i]}");
-            Console.Write("Fascia oraria (numero): ");
+            Console.Write("Orario (n.): ");
             int indexOra = int.Parse(Console.ReadLine()) - 1;
 
             string aulaScelta = auleDisponibili[indexAula];
             string oraScelta = fasceOrarie[indexOra];
 
-            // MODIFICA: Conteggio delle prenotazioni esistenti per quel turno
-            int postiOccupati = databasePrenotazioni.Count(p => 
-                p.Aula == aulaScelta && 
-                p.Data.Date == data.Date && 
-                p.FasciaOraria == oraScelta);
+            int postiOccupati = databasePrenotazioni.Count(p => p.Aula == aulaScelta && p.Data.Date == data.Date && p.FasciaOraria == oraScelta);
 
             if (postiOccupati >= CAPIENZA_MASSIMA)
             {
@@ -103,20 +146,8 @@ namespace GestioneAuleStudio
                     Data = data,
                     FasciaOraria = oraScelta
                 });
-                Console.WriteLine($"\n✅ Prenotazione confermata! (Posto {postiOccupati + 1} di {CAPIENZA_MASSIMA})");
-            }
-            Console.ReadKey();
-        }
-
-        static void VisualizzaPrenotazioni(string studente)
-        {
-            Console.Clear();
-            var mie = databasePrenotazioni.Where(p => p.Studente.Equals(studente, StringComparison.OrdinalIgnoreCase)).ToList();
-            if (mie.Count == 0) Console.WriteLine("Nessuna prenotazione.");
-            else
-            {
-                foreach (var p in mie)
-                    Console.WriteLine($"ID: {p.Id} | {p.Aula} | {p.Data:dd/MM/yyyy} | {p.FasciaOraria}");
+                SalvaDati(); // SALVATAGGIO SU FILE
+                Console.WriteLine($"\n✅ Prenotazione confermata! Posto {postiOccupati + 1}/15.");
             }
             Console.ReadKey();
         }
@@ -126,7 +157,7 @@ namespace GestioneAuleStudio
             VisualizzaPrenotazioni(studente);
             Console.Write("\nID da modificare: ");
             int id = int.Parse(Console.ReadLine());
-            var p = databasePrenotazioni.FirstOrDefault(x => x.Id == id && x.Studente == studente);
+            var p = databasePrenotazioni.FirstOrDefault(x => x.Id == id && x.Studente.Equals(studente, StringComparison.OrdinalIgnoreCase));
 
             if (p != null)
             {
@@ -135,20 +166,16 @@ namespace GestioneAuleStudio
                 for (int i = 0; i < fasceOrarie.Length; i++) Console.WriteLine($"{i + 1}. {fasceOrarie[i]}");
                 int indexOra = int.Parse(Console.ReadLine()) - 1;
 
-                // MODIFICA: Controllo capienza anche per la modifica
-                int postiOccupati = databasePrenotazioni.Count(x => 
-                    x.Aula == p.Aula && 
-                    x.Data.Date == nData.Date && 
-                    x.FasciaOraria == fasceOrarie[indexOra] && 
-                    x.Id != id); // Escludiamo la prenotazione stessa che stiamo modificando
+                int postiOccupati = databasePrenotazioni.Count(x => x.Aula == p.Aula && x.Data.Date == nData.Date && x.FasciaOraria == fasceOrarie[indexOra] && x.Id != id);
 
                 if (postiOccupati < CAPIENZA_MASSIMA)
                 {
                     p.Data = nData;
                     p.FasciaOraria = fasceOrarie[indexOra];
-                    Console.WriteLine("✅ Modifica effettuata.");
+                    SalvaDati(); // AGGIORNAMENTO SU FILE
+                    Console.WriteLine("✅ Modifica salvata su disco.");
                 }
-                else Console.WriteLine("\n❌ Errore: L'aula è già completamente occupata nel nuovo orario scelto!");
+                else Console.WriteLine("\n❌ Errore: Aula piena nel nuovo orario!");
             }
             Console.ReadKey();
         }
@@ -158,18 +185,38 @@ namespace GestioneAuleStudio
             VisualizzaPrenotazioni(studente);
             Console.Write("\nID da cancellare: ");
             int id = int.Parse(Console.ReadLine());
-            var p = databasePrenotazioni.FirstOrDefault(x => x.Id == id && x.Studente == studente);
-            if (p != null) { databasePrenotazioni.Remove(p); Console.WriteLine("✅ Cancellata."); }
+            var p = databasePrenotazioni.FirstOrDefault(x => x.Id == id && x.Studente.Equals(studente, StringComparison.OrdinalIgnoreCase));
+            if (p != null) 
+            { 
+                databasePrenotazioni.Remove(p); 
+                SalvaDati(); // RIMOZIONE DAL FILE
+                Console.WriteLine("✅ Prenotazione eliminata."); 
+            }
+            Console.ReadKey();
+        }
+        #endregion
+
+        static void VisualizzaPrenotazioni(string studente)
+        {
+            Console.Clear();
+            var mie = databasePrenotazioni.Where(p => p.Studente.Equals(studente, StringComparison.OrdinalIgnoreCase)).ToList();
+            if (mie.Count == 0) Console.WriteLine("Nessuna prenotazione trovata.");
+            else
+            {
+                foreach (var p in mie)
+                    Console.WriteLine($"ID: {p.Id} | {p.Aula} | {p.Data:dd/MM/yyyy} | {p.FasciaOraria}");
+            }
             Console.ReadKey();
         }
 
         static void MenuAdmin()
         {
             Console.Clear();
-            Console.WriteLine("--- REPORT MANAGER (TUTTE LE PRENOTAZIONI) ---");
+            Console.WriteLine("--- REPORT MANAGER (DATI CARICATI DA FILE) ---");
+            if (databasePrenotazioni.Count == 0) Console.WriteLine("Database vuoto.");
             foreach (var p in databasePrenotazioni)
             {
-                Console.WriteLine($"[{p.Aula}] {p.Data:dd/MM} {p.FasciaOraria} - Studente: {p.Studente}");
+                Console.WriteLine($"ID: {p.Id} | [{p.Aula}] | {p.Data:dd/MM} | {p.FasciaOraria} | Studente: {p.Studente}");
             }
             Console.WriteLine("\nPremi un tasto...");
             Console.ReadKey();

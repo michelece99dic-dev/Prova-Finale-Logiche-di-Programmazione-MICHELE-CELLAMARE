@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("Prova Finale Logiche di Programmazione MICHELE CELLAMARE")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+8e91a7838a99bff412e00b76574f8803f3c579a3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+3a35b365ea8f3fa4a9fa7ac51439b14f40de0d06")]
 [assembly: System.Reflection.AssemblyProductAttribute("Prova Finale Logiche di Programmazione MICHELE CELLAMARE")]
 [assembly: System.Reflection.AssemblyTitleAttribute("Prova Finale Logiche di Programmazione MICHELE CELLAMARE")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

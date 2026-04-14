@@ -1,0 +1,9 @@
+[
+  {
+    "Id": 1,
+    "Studente": "Michele",
+    "Aula": "Aula A",
+    "Data": "1999-12-17T00:00:00",
+    "FasciaOraria": "09:00-11:00"
+  }
+]
