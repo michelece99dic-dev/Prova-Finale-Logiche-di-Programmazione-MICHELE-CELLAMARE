@@ -1,0 +1,15 @@
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\bin\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.exe
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\bin\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.deps.json
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\bin\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.runtimeconfig.json
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\bin\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.dll
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\bin\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.pdb
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.AssemblyInfoInputs.cache
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.AssemblyInfo.cs
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.csproj.CoreCompileInputs.cache
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.sourcelink.json
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.dll
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\refint\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.dll
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.pdb
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.genruntimeconfig.cache
+C:\Users\Miche\Desktop\Prova Finale Logiche di Programmazione MICHELE CELLAMARE\obj\Debug\net9.0\ref\Prova Finale Logiche di Programmazione MICHELE CELLAMARE.dll

@@ -1,0 +1,219 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+
+namespace GestioneAuleStudio
+{
+    // Modello dati per la prenotazione
+    class Prenotazione
+    {
+        public int Id { get; set; }
+        public string Studente { get; set; }
+        public string Aula { get; set; }
+        public DateTime Data { get; set; }
+        public string FasciaOraria { get; set; } // Es: "09:00-11:00"
+    }
+
+    class Program
+    {
+        static List<Prenotazione> databasePrenotazioni = new List<Prenotazione>();
+        static int contatoreId = 1;
+        static string[] auleDisponibili = { "Aula A", "Aula B", "Aula Informatica", "Laboratorio" };
+        static string[] fasceOrarie = { "09:00-11:00", "11:00-13:00", "14:00-16:00", "16:00-18:00" };
+
+        static void Main(string[] args)
+        {
+            while (true)
+            {
+                Console.Clear();
+                Console.WriteLine("=== SISTEMA PRENOTAZIONE AULE STUDIO ===");
+                Console.WriteLine("1. Accesso Studente");
+                Console.WriteLine("2. Accesso Amministratore (Manager)");
+                Console.WriteLine("0. Esci");
+                Console.Write("\nSeleziona un'opzione: ");
+
+                string scelta = Console.ReadLine();
+
+                switch (scelta)
+                {
+                    case "1":
+                        MenuStudente();
+                        break;
+                    case "2":
+                        MenuAdmin();
+                        break;
+                    case "0":
+                        return;
+                    default:
+                        Console.WriteLine("Scelta non valida.");
+                        System.Threading.Thread.Sleep(1000);
+                        break;
+                }
+            }
+        }
+
+        #region MENU STUDENTE
+        static void MenuStudente()
+        {
+            Console.Write("\nInserisci il tuo nome: ");
+            string nomeStudente = Console.ReadLine();
+
+            bool inMenu = true;
+            while (inMenu)
+            {
+                Console.Clear();
+                Console.WriteLine($"--- BENVENUTO {nomeStudente.ToUpper()} ---");
+                Console.WriteLine("1. Prenota un'aula");
+                Console.WriteLine("2. Visualizza le mie prenotazioni");
+                Console.WriteLine("3. Modifica una prenotazione");
+                Console.WriteLine("4. Cancella una prenotazione");
+                Console.WriteLine("0. Torna al menu principale");
+                Console.Write("\nScelta: ");
+
+                string scelta = Console.ReadLine();
+
+                switch (scelta)
+                {
+                    case "1": PrenotaAula(nomeStudente); break;
+                    case "2": VisualizzaPrenotazioni(nomeStudente); break;
+                    case "3": ModificaPrenotazione(nomeStudente); break;
+                    case "4": CancellaPrenotazione(nomeStudente); break;
+                    case "0": inMenu = false; break;
+                }
+            }
+        }
+
+        static void PrenotaAula(string studente)
+        {
+            Console.Clear();
+            Console.WriteLine("--- NUOVA PRENOTAZIONE ---");
+            
+            // Selezione Aula
+            for (int i = 0; i < auleDisponibili.Length; i++) 
+                Console.WriteLine($"{i + 1}. {auleDisponibili[i]}");
+            Console.Write("Scegli l'aula (numero): ");
+            int indexAula = int.Parse(Console.ReadLine()) - 1;
+
+            // Selezione Data
+            Console.Write("Inserisci la data (gg/mm/aaaa): ");
+            DateTime data = DateTime.Parse(Console.ReadLine());
+
+            // Selezione Orario
+            for (int i = 0; i < fasceOrarie.Length; i++) 
+                Console.WriteLine($"{i + 1}. {fasceOrarie[i]}");
+            Console.Write("Scegli la fascia oraria (numero): ");
+            int indexOra = int.Parse(Console.ReadLine()) - 1;
+
+            string aulaScelta = auleDisponibili[indexAula];
+            string oraScelta = fasceOrarie[indexOra];
+
+            // Controllo disponibilità
+            bool occupata = databasePrenotazioni.Any(p => p.Aula == aulaScelta && p.Data.Date == data.Date && p.FasciaOraria == oraScelta);
+
+            if (occupata)
+            {
+                Console.WriteLine("\n❌ Errore: L'aula è già occupata in questo orario!");
+            }
+            else
+            {
+                databasePrenotazioni.Add(new Prenotazione {
+                    Id = contatoreId++,
+                    Studente = studente,
+                    Aula = aulaScelta,
+                    Data = data,
+                    FasciaOraria = oraScelta
+                });
+                Console.WriteLine("\n✅ Prenotazione effettuata con successo!");
+            }
+            Console.WriteLine("\nPremi un tasto per continuare...");
+            Console.ReadKey();
+        }
+
+        static void VisualizzaPrenotazioni(string studente)
+        {
+            Console.Clear();
+            var miePrenotazioni = databasePrenotazioni.Where(p => p.Studente.Equals(studente, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (miePrenotazioni.Count == 0)
+            {
+                Console.WriteLine("Non hai prenotazioni attive.");
+            }
+            else
+            {
+                Console.WriteLine("{0,-5} {1,-15} {2,-12} {3,-15}", "ID", "Aula", "Data", "Orario");
+                foreach (var p in miePrenotazioni)
+                {
+                    Console.WriteLine("{0,-5} {1,-15} {2,-12:dd/MM/yyyy} {3,-15}", p.Id, p.Aula, p.Data, p.FasciaOraria);
+                }
+            }
+            Console.WriteLine("\nPremi un tasto per continuare...");
+            Console.ReadKey();
+        }
+
+        static void ModificaPrenotazione(string studente)
+        {
+            VisualizzaPrenotazioni(studente);
+            Console.Write("\nInserisci l'ID della prenotazione da modificare: ");
+            int id = int.Parse(Console.ReadLine());
+
+            var p = databasePrenotazioni.FirstOrDefault(x => x.Id == id && x.Studente.Equals(studente, StringComparison.OrdinalIgnoreCase));
+
+            if (p != null)
+            {
+                Console.Write("Inserisci la nuova data (gg/mm/aaaa): ");
+                DateTime nuovaData = DateTime.Parse(Console.ReadLine());
+                
+                for (int i = 0; i < fasceOrarie.Length; i++) Console.WriteLine($"{i + 1}. {fasceOrarie[i]}");
+                Console.Write("Scegli la nuova fascia oraria: ");
+                int indexOra = int.Parse(Console.ReadLine()) - 1;
+
+                // Controllo se il nuovo slot è libero
+                bool occupata = databasePrenotazioni.Any(x => x.Aula == p.Aula && x.Data.Date == nuovaData.Date && x.FasciaOraria == fasceOrarie[indexOra] && x.Id != id);
+
+                if (!occupata)
+                {
+                    p.Data = nuovaData;
+                    p.FasciaOraria = fasceOrarie[indexOra];
+                    Console.WriteLine("✅ Modifica completata!");
+                }
+                else { Console.WriteLine("❌ Slot già occupato!"); }
+            }
+            else { Console.WriteLine("ID non trovato."); }
+            Console.ReadKey();
+        }
+
+        static void CancellaPrenotazione(string studente)
+        {
+            VisualizzaPrenotazioni(studente);
+            Console.Write("\nInserisci l'ID della prenotazione da cancellare: ");
+            int id = int.Parse(Console.ReadLine());
+
+            var p = databasePrenotazioni.FirstOrDefault(x => x.Id == id && x.Studente.Equals(studente, StringComparison.OrdinalIgnoreCase));
+            if (p != null)
+            {
+                databasePrenotazioni.Remove(p);
+                Console.WriteLine("✅ Cancellazione effettuata.");
+            }
+            else { Console.WriteLine("Prenotazione non trovata."); }
+            Console.ReadKey();
+        }
+        #endregion
+
+        #region MENU ADMIN
+        static void MenuAdmin()
+        {
+            Console.Clear();
+            Console.WriteLine("--- LOG MANAGER ---");
+            Console.WriteLine("Tutte le prenotazioni nel sistema:");
+            if (databasePrenotazioni.Count == 0) Console.WriteLine("Nessuna prenotazione presente.");
+            
+            foreach (var p in databasePrenotazioni)
+            {
+                Console.WriteLine($"ID: {p.Id} | Studente: {p.Studente} | Aula: {p.Aula} | Data: {p.Data:dd/MM/yyyy} | Ore: {p.FasciaOraria}");
+            }
+            Console.WriteLine("\nPremi un tasto per tornare al menu...");
+            Console.ReadKey();
+        }
+        #endregion
+    }
+}
